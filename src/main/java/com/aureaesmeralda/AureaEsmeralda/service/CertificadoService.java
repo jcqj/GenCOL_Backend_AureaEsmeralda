@@ -29,7 +29,11 @@ public class CertificadoService {
     }
 
     public Optional<Certificado> obtenerPorCodigo(String codigo) {
-        return certificadoRepository.findByCodigo(codigo);
+        return certificadoRepository.findByCodigoIgnoreCase(codigo);
+    }
+
+    public Optional<Certificado> obtenerProductoId(Long productoId) {
+        return certificadoRepository.findByProductoId(productoId);
     }
 
     public Certificado actualizarCertificado(Long id, Certificado datos) {
