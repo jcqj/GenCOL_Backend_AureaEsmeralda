@@ -8,8 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface CertificadoRepository extends JpaRepository<Certificado, Long> {
-    Optional<Certificado> findByCodigo(String codigo);
-    Optional<Certificado> findByCodigoIgnoreCase(String codigo);
-    boolean existsByCodigoIgnoreCase(String codigo);
-    Optional<Certificado> findByProductoId(Long productoId);
+
+    //! Buscar un certificado específico mediante su código único
+    Optional<Certificado> findByCodigoCert(String codigoCert);
 }

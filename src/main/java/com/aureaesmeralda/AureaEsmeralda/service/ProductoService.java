@@ -1,88 +1,48 @@
 package com.aureaesmeralda.AureaEsmeralda.service;
 
-import com.aureaesmeralda.AureaEsmeralda.model.Categoria;
+import com.aureaesmeralda.AureaEsmeralda.DTO.ProductoDTO;
 import com.aureaesmeralda.AureaEsmeralda.model.Producto;
 import com.aureaesmeralda.AureaEsmeralda.repository.ProductoRepository;
+import com.aureaesmeralda.AureaEsmeralda.util.MapperUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
 
-    private final ProductoRepository productoRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
-    public ProductoService(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
+    @Transactional(readOnly = true)
+    public List<ProductoDTO> obtenerTodosLosProductos() {
+        return productoRepository.findAll().stream()
+                .map(MapperUtil::toProductoDTO)
+                .collect(Collectors.toList());
     }
 
-    public Producto crearProducto(Producto producto) {
-        return productoRepository.save(producto);
-    }
-
-    public List<Producto> obtenerTodos() {
-        return productoRepository.findAll();
-    }
-
-    public Optional<Producto> obtenerPorId(Long id) {
-        return productoRepository.findById(id);
-    }
-
-    public List<Producto> obtenerPorCategoria(Categoria categoria) {
-        return productoRepository.findByCategoria(categoria);
-    }
-
-    public List<Producto> obtenerBestSellers() {
-        return productoRepository.findByBestSellerTrue();
-    }
-
-    public List<Producto> obtenerPorDisponibilidad(String disponibilidad) {
-        return productoRepository.findByDisponibilidadIgnoreCase(disponibilidad);
-    }
-
-    public List<Producto> buscarPorDescripcion(String descripcion) {
-        return productoRepository.findByDescripcionContainingIgnoreCase(descripcion);
-    }
-
-    public List<Producto> obtenerPorRangoPrecio(Double min, Double max) {
-        return productoRepository.findByPrecioOriginalBetween(min, max);
-    }
-
-    public List<Producto> obtenerPorCategoriaYBestSeller(Categoria categoria) {
-        return productoRepository.findByCategoriaAndBestSellerTrue(categoria);
-    }
-
-    public List<Producto> obtenerPorCategoriaYRangoPrecio(Categoria categoria, Double min, Double max) {
-        return productoRepository.findByCategoriaAndPrecioOriginalBetween(categoria, min, max);
-    }
-
-    public List<Producto> obtenerPorDisponibilidadYRangoPrecio(String disponibilidad, Double min, Double max) {
-        return productoRepository.findByDisponibilidadIgnoreCaseAndPrecioOriginalBetween(disponibilidad, min, max);
-    }
-
-    public Producto actualizarProducto(Long id, Producto productoDetalles) {
+    @Transactional(readOnly = true)
+    public ProductoDTO obtenerProductoPorId(Long id) {
         Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("El producto con el ID " + id + " no existe."));
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        return MapperUtil.toProductoDTO(producto);
 
-        producto.setCategoria(productoDetalles.getCategoria());
-        producto.setDescripcion(productoDetalles.getDescripcion());
-        producto.setPrecioOriginal(productoDetalles.getPrecioOriginal());
-        producto.setDescuento(productoDetalles.getDescuento());
-        producto.setCantidad(productoDetalles.getCantidad());
-        producto.setDisponibilidad(productoDetalles.getDisponibilidad());
-        producto.setBestSeller(productoDetalles.getBestSeller());
-
-        if (productoDetalles.getCertificado() != null) {
-            producto.setCertificado(productoDetalles.getCertificado());
-        }
-
-        return productoRepository.save(producto);
     }
 
-    public void eliminarProducto(Long id) {
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("El producto con el ID " + id + " no existe."));
-        productoRepository.delete(producto);
+    @Transactional(readOnly = true)
+    public List<ProductoDTO> obtenerProductosPorCategoria(String categoria) {
+        return productoRepository.findByCategoriaPdIgnoreCase(categoria).stream()
+                .map(MapperUtil::toProductoDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductoDTO> obtenerMasVendidos() {
+        return productoRepository.findByBestSellerPdTrue().stream()
+                .map(MapperUtil::toProductoDTO)
+                .collect(Collectors.toList());
     }
 }

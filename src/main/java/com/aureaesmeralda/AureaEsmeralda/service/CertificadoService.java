@@ -1,4 +1,4 @@
-package com.aureaesmeralda.AureaEsmeralda.service;
+package src.main.java.com.aureaesmeralda.AureaEsmeralda.service;
 
 import com.aureaesmeralda.AureaEsmeralda.repository.CertificadoRepository;
 import org.springframework.stereotype.Service;
@@ -32,12 +32,8 @@ public class CertificadoService {
         return certificadoRepository.findByCodigoIgnoreCase(codigo);
     }
 
-    public Optional<Certificado> obtenerPorProductoId(Long productoId) {
+    public Optional<Certificado> obtenerProductoId(Long productoId) {
         return certificadoRepository.findByProductoId(productoId);
-    }
-
-    public boolean existePorCodigo(String codigo) {
-        return certificadoRepository.existsByCodigoIgnoreCase(codigo);
     }
 
     public Certificado actualizarCertificado(Long id, Certificado datos) {

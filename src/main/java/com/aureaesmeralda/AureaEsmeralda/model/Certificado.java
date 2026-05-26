@@ -1,119 +1,96 @@
 package com.aureaesmeralda.AureaEsmeralda.model;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
-
-
 @Entity
 @Table(name = "certificados")
 public class Certificado {
 
+    //! Llave primaria autoincremental
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cert")
-    private Long id;
+    private Long idCert;
 
-    //CÓDIGO DEL CERTIFICADO
-    @NotBlank(message = "El codigo del certificado es obligatorio")
-    @Column(name = "codigo_cert", unique = true, nullable = false, length = 100)
-    private String codigo;
-
-    //GEMOLOGO QUE CERTIFICA
-    @NotBlank(message = "Nombre del gemologo es obligatorio")
-    @Column(name = "nombre_gemologo", nullable = false, length = 150)
-    private String nombreGemologo;
-
-    //FECHA DE CERTIFICACION
-    @NotNull(message = "La fecha de certificacion es obligatoria")
-    @Column(name = "fecha_cert", nullable = false)
-    private LocalDate fechaCert;
-
-    //PDF CERTIFICADO
-    @Column(name = "url_pdf_cert", length = 500)
-    private String urlPdf;
-
-    //IMAGEN
-    @Column(name = "imagen_joya", length = 500)
-    private String imagenJoya;
-
-    //Conexion
+    //! CLAVE FORÁNEA: Relación Uno a Uno con Producto (Mapeado a pd_id)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id", nullable = false, unique = true)
-    @JsonBackReference
+    @JoinColumn(name = "pd_id", nullable = false, unique = true)
+    @NotNull(message = "El producto asociado es obligatorio")
     private Producto producto;
 
-    public Certificado () {}
+    //! Nombre del gemólogo que realiza la certificación
+    @NotBlank(message = "El nombre del gemólogo es obligatorio")
+    @Size(max = 150, message = "El nombre del gemólogo no puede superar los 150 caracteres")
+    @Column(name = "nombre_gemologo_cert", nullable = false, length = 150)
+    private String nombreGemologoCert;
 
-    public Certificado(String codigo, String nombreGemologo, LocalDate fechaCert, String urlPdf, String imagenJoya, Producto producto) {
-        this.codigo = codigo;
-        this.nombreGemologo = nombreGemologo;
-        this.fechaCert = fechaCert;
-        this.urlPdf = urlPdf;
-        this.imagenJoya = imagenJoya;
+    //! Fecha en la que se emite el certificado
+    @NotNull(message = "La fecha de certificación es obligatoria")
+    @Column(name = "creado_en_cert", nullable = false)
+    private LocalDate creadoEnCert;
+
+    //! Detalles técnicos o especificaciones de la joya
+    @NotBlank(message = "Los detalles del certificado son obligatorios")
+    @Size(max = 255, message = "Los detalles no pueden superar los 255 caracteres")
+    @Column(name = "detalles_cert", nullable = false, length = 255)
+    private String detallesCert;
+
+    //! Código único de identificación del certificado
+    @NotBlank(message = "El código del certificado es obligatorio")
+    @Size(max = 100, message = "El código no puede superar los 100 caracteres")
+    @Column(name = "codigo_cert", unique = true, nullable = false, length = 100)
+    private String codigoCert;
+
+    //! URL del archivo PDF digital del certificado
+    @Size(max = 500, message = "La URL del archivo PDF no puede superar los 500 caracteres")
+    @Column(name = "archivo_url_cert", length = 500)
+    private String archivoUrlCert;
+
+    //! URL de la imagen de la joya asociada al certificado
+    @Size(max = 500, message = "La URL de la imagen no puede superar los 500 caracteres")
+    @Column(name = "imagen_joya_cert", length = 500)
+    private String imagenJoyaCert;
+
+    //! Constructor vacío obligatorio para JPA
+    public Certificado() {}
+
+    //! Constructor personalizado con los atributos del diagrama
+    public Certificado(Producto producto, String nombreGemologoCert, LocalDate creadoEnCert,
+                       String detallesCert, String codigoCert, String archivoUrlCert, String imagenJoyaCert) {
         this.producto = producto;
+        this.nombreGemologoCert = nombreGemologoCert;
+        this.creadoEnCert = creadoEnCert;
+        this.detallesCert = detallesCert;
+        this.codigoCert = codigoCert;
+        this.archivoUrlCert = archivoUrlCert;
+        this.imagenJoyaCert = imagenJoyaCert;
     }
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
+    //! ─────────────── GETTERS Y SETTERS ───────────────
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getIdCert() { return idCert; }
+    public void setIdCert(Long idCert) { this.idCert = idCert; }
 
-    public String getCodigo() {
-        return codigo;
-    }
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
+    public String getNombreGemologoCert() { return nombreGemologoCert; }
+    public void setNombreGemologoCert(String nombreGemologoCert) { this.nombreGemologoCert = nombreGemologoCert; }
 
-    public String getNombreGemologo() {
-        return nombreGemologo;
-    }
+    public LocalDate getCreadoEnCert() { return creadoEnCert; }
+    public void setCreadoEnCert(LocalDate creadoEnCert) { this.creadoEnCert = creadoEnCert; }
 
-    public void setNombreGemologo(String nombreGemologo) {
-        this.nombreGemologo = nombreGemologo;
-    }
+    public String getDetallesCert() { return detallesCert; }
+    public void setDetallesCert(String detallesCert) { this.detallesCert = detallesCert; }
 
-    public LocalDate getFechaCert() {
-        return fechaCert;
-    }
+    public String getCodigoCert() { return codigoCert; }
+    public void setCodigoCert(String codigoCert) { this.codigoCert = codigoCert; }
 
-    public void setFechaCert(LocalDate fechaCert) {
-        this.fechaCert = fechaCert;
-    }
+    public String getArchivoUrlCert() { return archivoUrlCert; }
+    public void setArchivoUrlCert(String archivoUrlCert) { this.archivoUrlCert = archivoUrlCert; }
 
-    public String getUrlPdf() {
-        return urlPdf;
-    }
-
-    public void setUrlPdf(String urlPdf) {
-        this.urlPdf = urlPdf;
-    }
-
-    public String getImagenJoya(){
-        return imagenJoya;
-    }
-
-    public void setImagenJoya(String imagenJoya){
-        this.imagenJoya = imagenJoya;
-    }
-
-
-    public Producto getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
-
-
-
+    public String getImagenJoyaCert() { return imagenJoyaCert; }
+    public void setImagenJoyaCert(String imagenJoyaCert) { this.imagenJoyaCert = imagenJoyaCert; }
 }

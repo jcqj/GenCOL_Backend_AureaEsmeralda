@@ -1,55 +1,65 @@
 package com.aureaesmeralda.AureaEsmeralda.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(
         name = "favoritos",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_favorito_usuario_producto",
-                columnNames = {"usuario_id", "producto_id"}
+        uniqueConstraints =
+            {
+                @UniqueConstraint
+                (
+                    name = "uk_favorito_usuario_producto",
+                    columnNames = { "us_id", "pd_id"}
+                )
+            }
         )
-)
+//@Table(name = "favoritos")
 public class Favorito {
-
+    //! Llave primaria
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_fav")
-    private Long id;
+    private Long idFav;
 
+    //! CALVE FORANEA, Many To One con USUARIOS.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "us_id", nullable = false)
+    @NotNull(message = "El usuario es obligatorio")
     private Usuario usuario;
 
+    //! CLAVE FORANEA: Many To One con Productos
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id", nullable = false)
-    private Producto producto;
+    @JoinColumn(name = "pd_id", nullable = false)
+    @NotNull(message = "El producto es obligatorio")
+    private Producto producto; // Almacena el objeto Producto completo
 
-    @Column(name = "agregado_en_fav", nullable = false, updatable = false)
-    private LocalDateTime agregadoEn;
+    //! Fecha en la que el usuario guardó el producto en favoritos
+    @Column(name = "creado_en_fav", nullable = false, updatable = false)
+    private LocalDateTime creadoEnFav;
 
+    //! Constructor vacío obligatorio para JPA
+    public Favorito() {
+    }
+
+    //! Hook automático para asignar la fecha justo antes de insertar el registro
     @PrePersist
     protected void onCreate() {
-        this.agregadoEn = LocalDateTime.now();
+        this.creadoEnFav = LocalDateTime.now();
     }
 
-    // Constructor vacío
-    public Favorito() {}
+    //! ─────────────── GETTERS Y SETTERS ───────────────
 
-    // Constructor con campos
-    public Favorito(Usuario usuario, Producto producto) {
-        this.usuario = usuario;
-        this.producto = producto;
+
+    public Long getIdFav() {
+        return idFav;
     }
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdFav(Long idFav) {
+        this.idFav = idFav;
     }
 
     public Usuario getUsuario() {
@@ -68,11 +78,11 @@ public class Favorito {
         this.producto = producto;
     }
 
-    public LocalDateTime getAgregadoEn() {
-        return agregadoEn;
+    public LocalDateTime getCreadoEnFav() {
+        return creadoEnFav;
     }
 
-    public void setAgregadoEn(LocalDateTime agregadoEn) {
-        this.agregadoEn = agregadoEn;
+    public void setCreadoEnFav(LocalDateTime creadoEnFav) {
+        this.creadoEnFav = creadoEnFav;
     }
 }
