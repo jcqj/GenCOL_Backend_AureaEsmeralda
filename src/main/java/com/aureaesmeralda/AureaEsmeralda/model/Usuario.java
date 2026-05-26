@@ -1,147 +1,166 @@
 package com.aureaesmeralda.AureaEsmeralda.model;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
-    //!        Creamos 'atributos' o 'columnas' para DB.
+    // ! Creamos 'atributos' o 'columnas' para DB.
 
-    //! ID incremental
+    // ! ID incremental
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_us")
     private Long idUs;
 
-    //! Nombre Usuario
+    // ! Nombre Usuario
     @NotBlank(message = "El nombre no puede estar vacio")
     @Size(min = 5, max = 150, message = "Ingresa un nombre valido")
-    @Column(name = "nombre_us",nullable = false, length = 150)
+    @Column(name = "nombre_us", nullable = false, length = 150)
     private String nombreUs;
 
-    //! TELEFONO Usuario
+    // ! TELEFONO Usuario
     @NotBlank(message = "El teléfono es obligatorio")
     @Size(min = 7, max = 15, message = "El teléfono debe tener entre 7 y 15 dígitos")
     @Pattern(regexp = "^\\+?[0-9]+$", message = "El teléfono solo puede contener números")
     @Column(name = "telefono_us", length = 15, nullable = false)
     private String telefonoUs;
 
-    //! Email es nuestro identificador unico de login.
-    //! CORREO Usuario
+    // ! Email es nuestro identificador unico de login.
+    // ! CORREO Usuario
     @NotBlank(message = "Ingrese un correo valido")
     @Email(message = "Ingrese un correo valido")
     @Column(name = "correo_us", unique = true, nullable = false, length = 150)
     private String correoUs;
 
-    //! CONTRASEÑA Usuario
+    // ! CONTRASEÑA Usuario
     @NotBlank(message = "Ingrese una contraseña valida")
     @Size(min = 5, message = "La contraseña debe te tener al menos 5 caracteres")
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
-            message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)"
-    )
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)")
     @Column(name = "contrasena_us", nullable = false)
     private String contrasenaUs;
 
-    //! ESTADO ACTIVO, inicializa en true
+    // ! ESTADO ACTIVO, inicializa en true
     @NotNull(message = "El estado es obligatorio")
     @Column(name = "estado_activo_us", nullable = false)
     private Boolean estadoActivoUs = true;
 
-    //! ROL
+    // ! ROL
     @NotBlank(message = "El rol es obligatorio")
     @Column(name = "rol_us", nullable = false, length = 30)
     private String rolUs = "Usuario";
 
-    //! CREADO EN
+    // ! CREADO EN
     @Column(name = "creado_en_us", nullable = false, updatable = false)
     private LocalDateTime creadoEnUs;
 
-    //! Constructor Vacio.
-    public Usuario(){}
+    // ! ────────── RELACIONES BIDIRECCIONALES ──────────
 
-    //! Método que se ejecuta automáticamente antes de guardar el usuario por primera vez
+    //! El usuario tiene un único carrito (1:1 inverso)
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Carrito carrito;
+
+    //! El usuario puede tener muchos registros en su lista de favoritos (1:N inverso)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Favorito> favoritos = new ArrayList<>();
+
+
+
+    // ! Constructor Vacio.
+    public Usuario() {
+    }
+
+    // ! Método que se ejecuta automáticamente antes de guardar el usuario por
+    // primera vez
     @PrePersist
-    protected void onCreate()
-    {
+    protected void onCreate() {
         this.creadoEnUs = LocalDateTime.now();
     }
 
-    //! ────────────────── GETTER Y SETTERS ──────────────────
+    // ! ────────────────── GETTER Y SETTERS ──────────────────
 
-    public Long getIdUs()
-    {
+    public Long getIdUs() {
         return idUs;
     }
-    public void setIdUs(Long idUs)
-    {
+
+    public void setIdUs(Long idUs) {
         this.idUs = idUs;
     }
 
-    public String getNombreUs()
-    {
+    public String getNombreUs() {
         return nombreUs;
     }
-    public void setNombreUs(String nombreUs)
-    {
+
+    public void setNombreUs(String nombreUs) {
         this.nombreUs = nombreUs;
     }
 
-    public String getTelefonoUs()
-    {
+    public String getTelefonoUs() {
         return telefonoUs;
     }
+
     public void setTelefonoUs(String telefonoUs) {
         this.telefonoUs = telefonoUs;
     }
 
-    public String getCorreoUs()
-    {
+    public String getCorreoUs() {
         return correoUs;
     }
-    public void setCorreoUs(String correoUs)
-    {
+
+    public void setCorreoUs(String correoUs) {
         this.correoUs = correoUs;
     }
 
-    public String getContrasenaUs()
-    {
+    public String getContrasenaUs() {
         return contrasenaUs;
     }
-    public void setContrasenaUs(String contrasenaUs)
-    {
+
+    public void setContrasenaUs(String contrasenaUs) {
         this.contrasenaUs = contrasenaUs;
     }
 
-    public Boolean getEstadoActivoUs()
-    {
+    public Boolean getEstadoActivoUs() {
         return estadoActivoUs;
     }
-    public void setEstadoActivoUs(Boolean estadoActivoUs)
-    {
+
+    public void setEstadoActivoUs(Boolean estadoActivoUs) {
         this.estadoActivoUs = estadoActivoUs;
     }
 
-    public String getRolUs()
-    {
+    public String getRolUs() {
         return rolUs;
     }
-    public void setRolUs(String rolUs)
-    {
+
+    public void setRolUs(String rolUs) {
         this.rolUs = rolUs;
     }
 
-    public LocalDateTime getCreadoEnUs()
-    {
+    public LocalDateTime getCreadoEnUs() {
         return creadoEnUs;
     }
-    public void setCreadoEnUs(LocalDateTime creadoEnUs)
-    {
+
+    public void setCreadoEnUs(LocalDateTime creadoEnUs) {
         this.creadoEnUs = creadoEnUs;
+    }
+
+    public Carrito getCarrito() {
+        return carrito;
+    }
+
+    public void setCarrito(Carrito carrito) {
+        this.carrito = carrito;
+    }
+
+    public List<Favorito> getFavoritos() {
+        return favoritos;
+    }
+
+    public void setFavoritos(List<Favorito> favoritos) {
+        this.favoritos = favoritos;
     }
 }
