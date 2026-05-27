@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name = "productos")
 public class Producto {
 
-    public enum Categoria { ANILLOS, COLLARES, PULSERAS }
+    public enum Categoria { ANILLOS, COLLARES, PULSERAS, ARETES }
 
     //! Llave primaria autoincremental
     @Id
@@ -71,7 +71,7 @@ public class Producto {
     //! Descripción: Campo de texto largo (mapeado como TEXT en BD)
     @NotBlank(message = "La descripción del producto es obligatoria")
     @Size(max = 500, message = "La descripción no puede superar los 500 caracteres")
-    @Column(name = "descripcion_pd", nullable = false, columnDefinition = TEXT)
+    @Column(name = "descripcion_pd", nullable = false, columnDefinition = "TEXT")
     private String descripcionPd;
 
     //! Fecha en la que se subió el producto
@@ -202,11 +202,11 @@ public class Producto {
         this.creadoEnPd = creadoEnPd;
     }
 
-    public String getCategoriaPd() {
+    public Categoria getCategoriaPd() {
         return categoriaPd;
     }
 
-    public void setCategoriaPd(String categoriaPd) {
+    public void setCategoriaPd(Categoria categoriaPd) {
         this.categoriaPd = categoriaPd;
     }
 
