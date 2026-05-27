@@ -12,8 +12,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "productos")
-public class Producto
-{
+public class Producto {
+
+    public enum Categoria { ANILLOS, COLLARES, PULSERAS }
+
     //! Llave primaria autoincremental
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +31,7 @@ public class Producto
     //! Precio Original: No puede ser nulo y debe ser un número positivo (mayor a 0).
     @NotNull(message = "El precio es obligatorio")
     @Positive(message = "El precio debe ser un número mayor a cero")
-    @Column(name = "precio_original_pd", nullable = false, precision = 12, scale = 0)
+    @Column(name = "precio_original_pd", nullable = false, precision = 12, scale = 2) //para manejar 2 decimales
     private BigDecimal precioOriginalPd;
 
     //! Descuento: Obligatorio, pero puede ser 0 (si no tiene descuento). Máximo 100%
@@ -68,8 +70,8 @@ public class Producto
 
     //! Descripción: Campo de texto largo (mapeado como TEXT en BD)
     @NotBlank(message = "La descripción del producto es obligatoria")
-    @Size(max = 255, message = "La descripción no puede superar los 255 caracteres")
-    @Column(name = "descripcion_pd", nullable = false, length = 255)
+    @Size(max = 500, message = "La descripción no puede superar los 500 caracteres")
+    @Column(name = "descripcion_pd", nullable = false, columnDefinition = TEXT)
     private String descripcionPd;
 
     //! Fecha en la que se subió el producto
@@ -77,13 +79,18 @@ public class Producto
     private LocalDateTime creadoEnPd;
 
     //! Categoria de producto
-    @NotBlank(message = "La categoría es obligatoria")
-    @Pattern(
-            regexp = "^(ANILLOS|COLLARES|PULSERAS)$",
-            message = "Categoría inválida. Los valores permitidos son: ANILLOS, COLLARES o PULSERAS"
-    )
+//    @NotBlank(message = "La categoría es obligatoria")
+//    @Pattern(
+//            regexp = "^(ANILLOS|COLLARES|PULSERAS)$",
+//            message = "Categoría inválida. Los valores permitidos son: ANILLOS, COLLARES o PULSERAS"
+//    )
+//    @Column(name = "categoria_pd", nullable = false, length = 30)
+//    private String categoriaPd;
+
+    @NotNull(message = "La categoría es obligatoria")
+    @Enumerated(EnumType.STRING) // se usa el enum de arriba
     @Column(name = "categoria_pd", nullable = false, length = 30)
-    private String categoriaPd;
+    private Categoria categoriaPd;
 
     // ! ────────── RELACIONES BIDIRECCIONALES ──────────
 

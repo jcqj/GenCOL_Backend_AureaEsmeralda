@@ -11,6 +11,7 @@ import java.util.List;
 @Table(name = "usuarios")
 public class Usuario {
     // ! Creamos 'atributos' o 'columnas' para DB.
+    public enum Rol {USUARIO, ADMIN}
 
     // ! ID incremental
     @Id
@@ -52,6 +53,7 @@ public class Usuario {
 
     // ! ROL
     @NotBlank(message = "El rol es obligatorio")
+    @Enumerated(EnumType.STRING)
     @Column(name = "rol_us", nullable = false, length = 30)
     private String rolUs = "Usuario";
 
@@ -69,6 +71,13 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Favorito> favoritos = new ArrayList<>();
 
+    public Usuario() {}
+
+    @PrePersist
+    protected void inCreate() {
+        this.creadoEnUs = LocalDateTime.now();
+    }
+
 
 
     // ! Constructor Vacio.
@@ -80,6 +89,24 @@ public class Usuario {
     @PrePersist
     protected void onCreate() {
         this.creadoEnUs = LocalDateTime.now();
+    }
+
+    //metodos helpers(sincronizacion bidireccional de manera segura)
+    public void asignarCarrito(Carrito carrito) {
+        this.carrito = carrito;
+        if (carrito!= null) {
+            carrito.setUsuario(this);
+        }
+    }
+
+    public void agregarFavorito(Favorito favorito) {
+        this.favoritos.add(favorito);
+        favorito.setUsuario(this);
+    }
+
+    public void removerFavorito(Favorito favorito) {
+        this.favoritos.remove(favorito);
+        favorito.setUsuario(null);
     }
 
     // ! ────────────────── GETTER Y SETTERS ──────────────────
@@ -144,9 +171,9 @@ public class Usuario {
         return creadoEnUs;
     }
 
-    public void setCreadoEnUs(LocalDateTime creadoEnUs) {
-        this.creadoEnUs = creadoEnUs;
-    }
+//    public void setCreadoEnUs(LocalDateTime creadoEnUs) {
+//        this.creadoEnUs = creadoEnUs;
+//    } para proteger inmutabilidad
 
     public Carrito getCarrito() {
         return carrito;
