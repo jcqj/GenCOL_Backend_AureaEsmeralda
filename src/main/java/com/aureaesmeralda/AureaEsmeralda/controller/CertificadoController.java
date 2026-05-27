@@ -21,17 +21,21 @@ public class CertificadoController {
         this.certificadoService = certificadoService;
     }
 
+    // GET certificados: http://localhost:8080/api/certificados
+    @GetMapping
+    public ResponseEntity<List<CertificadoDTO>> listarTodos() {
+        return ResponseEntity.ok(certificadoService.obtenerTodos());
+    }
+
     // GET por ID: http://localhost:8080/api/certificados/1
     @GetMapping("/{id}")
     public ResponseEntity<CertificadoDTO> buscarPorId(@PathVariable Long id) {
-        CertificadoDTO certificado = certificadoService.obtenerCertificadoPorId(id);
-        return ResponseEntity.ok(certificado);
+        return ResponseEntity.ok(certificadoService.obtenerCertificadoPorId(id));
     }
 
     // GET por código único: http://localhost:8080/api/certificados/codigo/CERT-001
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<CertificadoDTO> buscarPorCodigo(@PathVariable String codigo) {
-        CertificadoDTO certificado = certificadoService.obtenerCertificadoPorCodigo(codigo);
-        return ResponseEntity.ok(certificado);
+        return ResponseEntity.ok(certificadoService.obtenerCertificadoPorCodigo(codigo));
     }
 }

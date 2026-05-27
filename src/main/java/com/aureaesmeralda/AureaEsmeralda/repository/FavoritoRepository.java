@@ -1,6 +1,7 @@
 package com.aureaesmeralda.AureaEsmeralda.repository;
 
 import com.aureaesmeralda.AureaEsmeralda.model.Favorito;
+<<<<<<< HEAD
 import com.aureaesmeralda.AureaEsmeralda.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,3 +22,14 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
     @Modifying
     int deleteByUsuarioIdUsAndProductoId(Long usuarioId, Long productoId);
 }
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
+    List<Favorito> findByUsuarioIdUs(Long idUs);
+}
+>>>>>>> origin/yesicag
