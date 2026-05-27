@@ -22,7 +22,7 @@ public class FavoritoController {
     // GET: http://localhost:8080/api/favoritos/usuario/1
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<FavoritoDTO>> listarFavoritosPorUsuario(@PathVariable Long usuarioId) {
-        List<FavoritoDTO> favoritos = favoritoService.obtainFavoritosPorUsuario(usuarioId);
+        List<FavoritoDTO> favoritos = favoritoService.obtenerFavoritosPorUsuario(usuarioId);
         return ResponseEntity.ok(favoritos);
     }
 

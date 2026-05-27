@@ -1,6 +1,7 @@
 package com.aureaesmeralda.AureaEsmeralda.DTO;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class UsuarioDTO {
     private Long idUs;
@@ -9,7 +10,7 @@ public class UsuarioDTO {
     private String correoUs;
     private Boolean estadoActivoUs;
     private String rolUs;
-    private LocalDate creadoEnUs;
+    private LocalDateTime creadoEnUs;
 
     public UsuarioDTO() {}
 
@@ -32,6 +33,6 @@ public class UsuarioDTO {
     public String getRolUs() { return rolUs; }
     public void setRolUs(String rolUs) { this.rolUs = rolUs; }
 
-    public LocalDate getCreadoEnUs() { return creadoEnUs; }
-    public void setCreadoEnUs(LocalDate creadoEnUs) { this.creadoEnUs = creadoEnUs; }
+    public LocalDateTime getCreadoEnUs() { return creadoEnUs; }
+    public void setCreadoEnUs(LocalDateTime creadoEnUs) { this.creadoEnUs = creadoEnUs; }
 }
