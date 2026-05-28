@@ -21,7 +21,7 @@ public class FavoritoService {
     private final UsuarioRepository usuarioRepository;
     private final ProductoRepository productoRepository;
 
-    // Reparado: Asignación correcta en el constructor
+    // Inyección por constructor impecable
     public FavoritoService(FavoritoRepository favoritoRepository, UsuarioRepository usuarioRepository, ProductoRepository productoRepository) {
         this.favoritoRepository = favoritoRepository;
         this.usuarioRepository = usuarioRepository;
@@ -30,13 +30,17 @@ public class FavoritoService {
 
     @Transactional
     public FavoritoDTO agregarFavorito(Long usuarioId, Long productoId) {
+        // CORRECCIÓN: Validar duplicados antes de hacer consultas pesadas de entidades
+        if (favoritoRepository.findByUsuarioIdUsAndProductoIdPd(usuarioId, productoId).isPresent()) {
+            throw new IllegalStateException("Esta joya ya se encuentra en la lista de favoritos del usuario.");
+        }
+
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario con ID " + usuarioId + " no existe."));
 
         Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new IllegalArgumentException("Producto con ID " + productoId + " no existe."));
 
-        // Reparado: Uso seguro mediante setters para evitar fallas de constructor
         Favorito favorito = new Favorito();
         favorito.setUsuario(usuario);
         favorito.setProducto(producto);
@@ -49,12 +53,21 @@ public class FavoritoService {
     public List<FavoritoDTO> obtenerFavoritosPorUsuario(Long usuarioId) {
         List<Favorito> favoritos = favoritoRepository.findByUsuarioIdUs(usuarioId);
         return favoritos.stream()
+                // CORREGIDO: Cambiamos toProductoDTO por toFavoritoDTO
                 .map(MapperUtil::toFavoritoDTO)
                 .collect(Collectors.toList());
     }
 
+    // MEJORA: Borrado flexible pensado en el comportamiento real del botón de la App (Vitrina)
     @Transactional
-    public void eliminarFavorito(Long id) {
+    public void eliminarFavoritoPorUsuarioYProducto(Long usuarioId, Long productoId) {
+        Favorito favorito = favoritoRepository.findByUsuarioIdUsAndProductoIdPd(usuarioId, productoId)
+                .orElseThrow(() -> new IllegalArgumentException("El producto indicado no estaba marcado como favorito por este usuario."));
+        favoritoRepository.delete(favorito);
+    }
+
+    @Transactional
+    public void eliminarFavoritoPorIdDirecto(Long id) {
         Favorito favorito = favoritoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Favorito con ID " + id + " no existe."));
         favoritoRepository.delete(favorito);

@@ -6,6 +6,7 @@ public class CarritoItemDTO {
     private Long idIt;
     private Long productoId;
     private String productoNombre;
+    private String productoImagen;
     private BigDecimal precioMomentaneoIt; // Precio entero
     private Integer cantidadIt;
 
@@ -48,5 +49,13 @@ public class CarritoItemDTO {
 
     public void setCantidadIt(Integer cantidadIt) {
         this.cantidadIt = cantidadIt;
+    }
+
+    public String getProductoImagen() {
+        return productoImagen;
+    }
+
+    public void setProductoImagen(String productoImagen) {
+        this.productoImagen = productoImagen;
     }
 }

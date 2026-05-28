@@ -14,7 +14,7 @@ public class ProductoDTO {
     private String imagenSecundariaPd;
     private String descripcionPd;
     private String categoriaPd;
-    private String codigoCertificado; // Simplificamos trayendo solo el código del certificado
+    private String codigoCertificado;
 
     // Constructor vacío
     public ProductoDTO() {

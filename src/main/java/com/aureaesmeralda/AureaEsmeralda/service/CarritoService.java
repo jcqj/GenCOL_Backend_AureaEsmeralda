@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -27,39 +28,29 @@ public class CarritoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Obtener el carrito de un usuario. Si no existe, se crea uno automáticamente.
-    @Transactional
+    // 1. Obtener el carrito (Capa Externa/Web)
+    @Transactional(readOnly = true)
     public CarritoDTO obtenerCarritoPorUsuario(Long usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Intentar buscar el carrito existente, sino inicializarlo
-        Carrito carrito = carritoRepository.findByUsuarioIdUs(usuarioId)
-                .orElseGet(() -> {
-                    Carrito nuevoCarrito = new Carrito();
-                    nuevoCarrito.setUsuario(usuario);
-                    return carritoRepository.save(nuevoCarrito);
-                });
-
+        Carrito carrito = buscarOAdjudicarCarritoEntidad(usuarioId);
         return MapperUtil.toCarritoDTO(carrito);
     }
 
-    // Agregar un producto al carrito
+    // 2. Agregar un producto al carrito (Optimizado)
     @Transactional
     public CarritoDTO agregarProductoAlCarrito(Long usuarioId, Long productoId, Integer cantidad) {
+        // Buscamos el producto
         Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + productoId));
 
-        // 1. Validar Stock General de la Joyería
+        // Validamos el Stock Inicial
         if (producto.getStockPd() < cantidad) {
-            throw new RuntimeException("Stock insuficiente. Solo quedan " + producto.getStockPd() + " unidades.");
+            throw new IllegalStateException("Stock insuficiente. Solo quedan " + producto.getStockPd() + " unidades.");
         }
 
-        // 2. Obtener el Carrito de la entidad
-        CarritoDTO carritoDto = obtenerCarritoPorUsuario(usuarioId);
-        Carrito carrito = carritoRepository.findById(carritoDto.getIdCar()).get();
+        // REGLA DE ORO: Buscamos la entidad del carrito directamente sin consultar de más
+        Carrito carrito = buscarOAdjudicarCarritoEntidad(usuarioId);
 
-        // 3. Verificar si el producto ya está en el carrito
+        // Verificamos si el producto ya está en el carrito
         Optional<CarritoItem> itemExistente = carrito.getItems().stream()
                 .filter(item -> item.getProducto().getIdPd().equals(productoId))
                 .findFirst();
@@ -68,40 +59,49 @@ public class CarritoService {
             CarritoItem item = itemExistente.get();
             int nuevaCantidad = item.getCantidadIt() + cantidad;
 
-            // Re-validar stock sumando lo que ya tenía en el carro
             if (producto.getStockPd() < nuevaCantidad) {
-                throw new RuntimeException("No puedes agregar más unidades. Supera el stock disponible.");
+                throw new IllegalStateException("No puedes agregar más unidades. Supera el stock disponible.");
             }
             item.setCantidadIt(nuevaCantidad);
         } else {
-            // Crear nuevo ítem en el carro
             CarritoItem nuevoItem = new CarritoItem();
             nuevoItem.setCarrito(carrito);
             nuevoItem.setProducto(producto);
-            // El precio original ya viene formateado como entero (scale = 0) desde la base de datos
             nuevoItem.setPrecioMomentaneoIt(producto.getPrecioOriginalPd());
             nuevoItem.setCantidadIt(cantidad);
 
-            // Relación bidireccional en memoria
             carrito.getItems().add(nuevoItem);
         }
 
-        // Al guardar el padre (Carrito), gracias al CascadeType.ALL se guardan/actualizan los hijos (CarritoItem)
         Carrito carritoActualizado = carritoRepository.save(carrito);
         return MapperUtil.toCarritoDTO(carritoActualizado);
     }
 
-    // Eliminar un producto por completo del carrito
+    // 3. Eliminar un producto por completo del carrito
     @Transactional
     public CarritoDTO eliminarProductoDelCarrito(Long usuarioId, Long productoId) {
         Carrito carrito = carritoRepository.findByUsuarioIdUs(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Carrito no encontrado para el usuario con ID: " + usuarioId));
 
-        // Se remueve de la lista del padre y orphanRemoval = true lo borra de la BD
         carrito.getItems().removeIf(item -> item.getProducto().getIdPd().equals(productoId));
 
         Carrito carritoActualizado = carritoRepository.save(carrito);
         return MapperUtil.toCarritoDTO(carritoActualizado);
+    }
 
+    /**
+     * MÉTODOS DE SOPORTE INTERNO (Auxiliar privado para reutilizar código y no repetir SQL)
+     */
+    private Carrito buscarOAdjudicarCarritoEntidad(Long usuarioId) {
+        return carritoRepository.findByUsuarioIdUs(usuarioId)
+                .orElseGet(() -> {
+                    Usuario usuario = usuarioRepository.findById(usuarioId)
+                            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + usuarioId));
+
+                    Carrito nuevoCarrito = new Carrito();
+                    nuevoCarrito.setUsuario(usuario);
+                    nuevoCarrito.setItems(new ArrayList<>()); // Red de seguridad: Evita el NullPointerException
+                    return carritoRepository.save(nuevoCarrito);
+                });
     }
 }
