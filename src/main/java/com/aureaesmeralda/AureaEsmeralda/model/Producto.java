@@ -79,8 +79,8 @@ public class Producto
     //! Categoria de producto
     @NotBlank(message = "La categoría es obligatoria")
     @Pattern(
-            regexp = "^(ANILLOS|COLLARES|PULSERAS)$",
-            message = "Categoría inválida. Los valores permitidos son: ANILLOS, COLLARES o PULSERAS"
+            regexp = "^(ANILLOS|COLLARES|PULSERAS|ARETES)$",
+            message = "Categoría inválida. Los valores permitidos son: ANILLOS, COLLARES, ARETES o PULSERAS"
     )
     @Column(name = "categoria_pd", nullable = false, length = 30)
     private String categoriaPd;

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto , Long>{
-    //! Buscar productos por categoría (ANILLOS, COLLARES, PULSERAS)
+    //! Buscar productos por categoría (ANILLOS, COLLARES, PULSERAS, ARETES)
     List<Producto> findByCategoriaPdIgnoreCase(String categoria);
 
     //! Filtrar solo los productos que están marcados como más vendidos
