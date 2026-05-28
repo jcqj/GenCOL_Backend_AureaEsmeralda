@@ -16,28 +16,33 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    // GET: http://localhost:8080/api/productos
+    //! Inyección por construcción
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
+
+    //! GET: http://localhost:8080/api/productos
     @GetMapping
     public ResponseEntity<List<ProductoDTO>> listarTodos() {
         List<ProductoDTO> productos = productoService.obtenerTodosLosProductos();
         return ResponseEntity.ok(productos);
     }
 
-    // GET por ID: http://localhost:8080/api/productos/1
+    //! GET por ID: http://localhost:8080/api/productos/1
     @GetMapping("/{id}")
     public ResponseEntity<ProductoDTO> buscarPorId(@PathVariable Long id) {
         ProductoDTO producto = productoService.obtenerProductoPorId(id);
         return ResponseEntity.ok(producto);
     }
 
-    // GET por categoría: http://localhost:8080/api/productos/categoria/ANILLOS
+    //! GET por categoría: http://localhost:8080/api/productos/categoria/ANILLOS
     @GetMapping("/categoria/{categoria}")
     public ResponseEntity<List<ProductoDTO>> listarPorCategoria(@PathVariable String categoria) {
         List<ProductoDTO> productos = productoService.obtenerProductosPorCategoria(categoria);
         return ResponseEntity.ok(productos);
     }
 
-    // GET best sellers: http://localhost:8080/api/productos/bestsellers
+    //! GET best sellers: http://localhost:8080/api/productos/bestsellers
     @GetMapping("/bestsellers")
     public ResponseEntity<List<ProductoDTO>> listarMasVendidos() {
         List<ProductoDTO> productos = productoService.obtenerMasVendidos();

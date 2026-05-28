@@ -38,7 +38,7 @@ public class FavoritoController {
     // DELETE: http://localhost:8080/api/favoritos/eliminar/5
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> quitarDeFavoritos(@PathVariable Long id) {
-        favoritoService.eliminarFavorito(id);
+        favoritoService.eliminarFavoritoPorIdDirecto(id);
         return ResponseEntity.noContent().build();
     }
 }
