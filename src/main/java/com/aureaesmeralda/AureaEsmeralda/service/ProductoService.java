@@ -45,4 +45,27 @@ public class ProductoService {
                 .map(MapperUtil::toProductoDTO)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public ProductoDTO crearProducto(ProductoDTO dto) {
+        Producto nuevoProducto = MapperUtil.toProductoEntity(dto);
+        Producto productoGuardado = productoRepository.save(nuevoProducto);
+        return MapperUtil.toProductoDTO(productoGuardado);
+    }
+
+    @Transactional
+    public ProductoDTO actualizarProducto(Long id, ProductoDTO dto) {
+        Producto productoExistente = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        MapperUtil.updateProductoFromDTO(dto, productoExistente);
+        Producto productoActualizado = productoRepository.save(productoExistente);
+        return MapperUtil.toProductoDTO(productoActualizado);
+    }
+
+    @Transactional
+    public void eliminarProducto(Long id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        productoRepository.delete(producto);
+    }
 }

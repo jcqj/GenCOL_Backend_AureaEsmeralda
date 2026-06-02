@@ -2,14 +2,16 @@ package com.aureaesmeralda.AureaEsmeralda.controller;
 
 import com.aureaesmeralda.AureaEsmeralda.DTO.ProductoDTO;
 import com.aureaesmeralda.AureaEsmeralda.service.ProductoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/productos")
 @CrossOrigin(origins = "*") // Permite llamadas desde tu frontend local de forma temporal
 public class ProductoController {
 
@@ -47,5 +49,26 @@ public class ProductoController {
     public ResponseEntity<List<ProductoDTO>> listarMasVendidos() {
         List<ProductoDTO> productos = productoService.obtenerMasVendidos();
         return ResponseEntity.ok(productos);
+    }
+
+    //! POST: http://localhost:8080/productos
+    @PostMapping
+    public ResponseEntity<ProductoDTO> crearProducto(@Valid @RequestBody ProductoDTO dto) {
+        ProductoDTO nuevoProducto = productoService.crearProducto(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
+    }
+
+    //! PUT: http://localhost:8080/productos/1
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductoDTO> actualizarProducto(@PathVariable Long id, @Valid @RequestBody ProductoDTO dto) {
+        ProductoDTO productoActualizado = productoService.actualizarProducto(id, dto);
+        return ResponseEntity.ok(productoActualizado);
+    }
+
+    //! DELETE: http://localhost:8080/productos/1
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
     }
 }

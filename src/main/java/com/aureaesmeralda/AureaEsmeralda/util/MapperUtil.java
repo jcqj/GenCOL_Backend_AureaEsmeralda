@@ -40,6 +40,41 @@ public class MapperUtil {
         return dto;
     }
 
+    public static Producto toProductoEntity(ProductoDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        Producto producto = new Producto();
+        producto.setIdPd(dto.getIdPd());
+        producto.setNombrePd(dto.getNombrePd());
+        producto.setPrecioOriginalPd(dto.getPrecioOriginalPd());
+        producto.setDescuentoPd(dto.getDescuentoPd() != null ? dto.getDescuentoPd() : 0);
+        producto.setStockPd(dto.getStockPd());
+        producto.setDisponiblePd(dto.getDisponiblePd() != null ? dto.getDisponiblePd() : true);
+        producto.setBestSellerPd(dto.getBestSellerPd() != null ? dto.getBestSellerPd() : false);
+        producto.setImagenPrincipalPd(dto.getImagenPrincipalPd());
+        producto.setImagenSecundariaPd(dto.getImagenSecundariaPd());
+        producto.setDescripcionPd(dto.getDescripcionPd());
+        producto.setCategoriaPd(dto.getCategoriaPd());
+        return producto;
+    }
+
+    public static void updateProductoFromDTO(ProductoDTO dto, Producto producto) {
+        if (dto == null || producto == null) {
+            return;
+        }
+        if (dto.getNombrePd() != null) producto.setNombrePd(dto.getNombrePd());
+        if (dto.getPrecioOriginalPd() != null) producto.setPrecioOriginalPd(dto.getPrecioOriginalPd());
+        if (dto.getDescuentoPd() != null) producto.setDescuentoPd(dto.getDescuentoPd());
+        if (dto.getStockPd() != null) producto.setStockPd(dto.getStockPd());
+        if (dto.getDisponiblePd() != null) producto.setDisponiblePd(dto.getDisponiblePd());
+        if (dto.getBestSellerPd() != null) producto.setBestSellerPd(dto.getBestSellerPd());
+        if (dto.getImagenPrincipalPd() != null) producto.setImagenPrincipalPd(dto.getImagenPrincipalPd());
+        if (dto.getImagenSecundariaPd() != null) producto.setImagenSecundariaPd(dto.getImagenSecundariaPd());
+        if (dto.getDescripcionPd() != null) producto.setDescripcionPd(dto.getDescripcionPd());
+        if (dto.getCategoriaPd() != null) producto.setCategoriaPd(dto.getCategoriaPd());
+    }
+
     public static CertificadoDTO toCertificadoDTO(Certificado certificado) {
         if (certificado == null) return null;
 
@@ -129,6 +164,46 @@ public class MapperUtil {
         }
         BigDecimal descuento = precioOriginal.multiply(new BigDecimal(porcentajeDescuento)).divide(new BigDecimal(100));
         return precioOriginal.subtract(descuento).setScale(0, RoundingMode.DOWN);
+    }
+
+    //! ORDEN / DETALLE ORDEN
+    public static OrdenDTO toOrdenDTO(Orden orden) {
+        if (orden == null) return null;
+
+        OrdenDTO dto = new OrdenDTO();
+        dto.setIdOrd(orden.getIdOrd());
+        dto.setTotalOrd(orden.getTotalOrd());
+        dto.setCreadoEnOrd(orden.getCreadoEnOrd());
+        dto.setEstadoOrd(orden.getEstadoOrd());
+        dto.setDireccionEnvioOrd(orden.getDireccionEnvioOrd());
+
+        if (orden.getUsuario() != null) {
+            dto.setUsuarioId(orden.getUsuario().getIdUs());
+        }
+
+        if (orden.getDetalles() != null) {
+            dto.setDetalles(orden.getDetalles().stream()
+                    .map(MapperUtil::toDetalleOrdenDTO)
+                    .toList());
+        }
+
+        return dto;
+    }
+
+    public static DetalleOrdenDTO toDetalleOrdenDTO(DetalleOrden detalle) {
+        if (detalle == null) return null;
+
+        DetalleOrdenDTO dto = new DetalleOrdenDTO();
+        dto.setIdDet(detalle.getIdDet());
+        dto.setCantidadDet(detalle.getCantidadDet());
+        dto.setPrecioUnitarioDet(detalle.getPrecioUnitarioDet());
+
+        if (detalle.getProducto() != null) {
+            dto.setProductoId(detalle.getProducto().getIdPd());
+            dto.setProductoNombre(detalle.getProducto().getNombrePd());
+        }
+
+        return dto;
     }
 
     //! USUARIODTO

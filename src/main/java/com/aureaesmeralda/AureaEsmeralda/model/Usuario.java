@@ -38,11 +38,9 @@ public class Usuario {
     @Column(name = "correo_us", unique = true, nullable = false, length = 150)
     private String correoUs;
 
-    // ! CONTRASEÑA Usuario
+    // ! CONTRASEÑA Usuario (se guarda hasheada con BCrypt)
     @NotBlank(message = "Ingrese una contraseña valida")
-    @Size(min = 5, message = "La contraseña debe te tener al menos 5 caracteres")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)")
-    @Column(name = "contrasena_us", nullable = false)
+    @Column(name = "contrasena_us", nullable = false, length = 255)
     private String contrasenaUs;
 
     // ! ESTADO ACTIVO, inicializa en true
